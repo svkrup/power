@@ -1,0 +1,49 @@
+---
+title: "Power consumption patterns across countries in 2012"
+author: "Krupakar S"
+date: "July 22, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning=FALSE, message=FALSE)
+```
+
+```{r}
+library(leaflet)
+```
+
+The daily energy consumption patterns of the top 22 countries in KWh is shown below. The data is for the year 2012. 
+
+```{r warning=FALSE, message=FALSE}
+countries <- read.csv("countries.csv", header=TRUE, sep=",", stringsAsFactors = FALSE)
+
+power <- read.csv("power.csv", sep = ",", header = TRUE, stringsAsFactors = FALSE)
+names(power)[2] <- "PCKwh"
+totalwh <- read.csv("twh.csv", sep=",", header = TRUE, stringsAsFactors = FALSE)
+power2012 <- merge(power, totalwh, by="Country")
+names(countries)[1] <- "Country"
+powerleaf <- merge(power2012, countries, by="Country")
+powerleaf %>% leaflet() %>% addTiles() %>% addLabelOnlyMarkers(lng= ~longitude, lat= ~latitude, label = ~as.character(powerleaf$PCKwh), labelOptions = labelOptions(noHide = T, direction = 'bottom', textOnly = T, style = list(
+         "color" = "dark grey",
+         "font-size" = "7px"
+       ))) %>% addCircleMarkers(lng= ~longitude, lat= ~latitude, fillColor = "green", radius=powerleaf$PCKwh/2, weight=.5, fillOpacity=0.8)
+
+```
+   
+    
+    
+          
+        
+The annual energy consumption patterns of the top 22 countries in TWh (Terawatt-Hours) is shown below. The data is for the year 2012. 
+    
+```{r warning=FALSE, message=FALSE}
+
+powerleaf %>% leaflet() %>% addTiles() %>% addLabelOnlyMarkers(lng= ~longitude, lat= ~latitude, label = ~as.character(powerleaf$TWh), labelOptions = labelOptions(noHide = T, direction = 'bottom', textOnly = T, style = list("color" = "black","font-size" = "7px"))) %>% addCircleMarkers(lng= ~longitude, lat= ~latitude, fillColor = "green", radius=powerleaf$TWh/200, weight=.5, fillOpacity=0.6)
+
+
+
+```
+
+
+The data is from this link at Wikipedia: [Global power consumption data for 2012](https://en.wikipedia.org/wiki/Electric_energy_consumption#World_electricity_consumption_.282012.29) 
