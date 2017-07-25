@@ -16,14 +16,22 @@ library(leaflet)
 The daily energy consumption patterns of the top 22 countries in KWh is shown below. The data is for the year 2012. 
 
 ```{r warning=FALSE, message=FALSE}
-countries <- read.csv("countries.csv", header=TRUE, sep=",", stringsAsFactors = FALSE)
+# Get country data with latitude and longitude of capital cities. Data obtained from: https://developers.google.com/public-data/docs/canonical/countries_csv
 
+countries <- read.csv("countries.csv", header=TRUE, sep=",", stringsAsFactors = FALSE)
+# Get daily power consumption data in KWh 
 power <- read.csv("power.csv", sep = ",", header = TRUE, stringsAsFactors = FALSE)
 names(power)[2] <- "PCKwh"
+# Get total annual consumption data in TWh
 totalwh <- read.csv("twh.csv", sep=",", header = TRUE, stringsAsFactors = FALSE)
+# Merge datasets
 power2012 <- merge(power, totalwh, by="Country")
 names(countries)[1] <- "Country"
+
+#Merge lat long information into the consumption dataset
 powerleaf <- merge(power2012, countries, by="Country")
+
+# Draw a leaflet that shows daily power consumption for countries
 powerleaf %>% leaflet() %>% addTiles() %>% addLabelOnlyMarkers(lng= ~longitude, lat= ~latitude, label = ~as.character(powerleaf$PCKwh), labelOptions = labelOptions(noHide = T, direction = 'bottom', textOnly = T, style = list(
          "color" = "dark grey",
          "font-size" = "7px"
@@ -39,6 +47,7 @@ The annual energy consumption patterns of the top 22 countries in TWh (Terawatt-
     
 ```{r warning=FALSE, message=FALSE}
 
+# Draw a leaflet that shows annual power consumption for countries
 powerleaf %>% leaflet() %>% addTiles() %>% addLabelOnlyMarkers(lng= ~longitude, lat= ~latitude, label = ~as.character(powerleaf$TWh), labelOptions = labelOptions(noHide = T, direction = 'bottom', textOnly = T, style = list("color" = "black","font-size" = "7px"))) %>% addCircleMarkers(lng= ~longitude, lat= ~latitude, fillColor = "green", radius=powerleaf$TWh/200, weight=.5, fillOpacity=0.6)
 
 
